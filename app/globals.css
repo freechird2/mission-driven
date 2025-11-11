@@ -94,3 +94,13 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
 }
+
+/* 스크롤바 숨기기 클래스 */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
