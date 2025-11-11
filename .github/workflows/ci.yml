@@ -1,0 +1,37 @@
+name: Deploy to Dev Client
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Execute deployment commands on remote client
+        run: |
+
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.INSTANCE_IP }} <<'EOF'
+          set -e
+          export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          nvm install --lts
+          npm i -g yarn
+          npm i -g pm2
+
+          cd FIGK-SERVICE.FE-USER
+          rm -rf node_modules yarn.lock
+          yarn
+          yarn build
+          pm2 restart all
+          EOF
