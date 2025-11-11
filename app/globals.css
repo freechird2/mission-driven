@@ -1,26 +1,96 @@
+@import url('pretendard/dist/web/variable/pretendardvariable.css');
 @import 'tailwindcss';
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  --primary: #03c124;
+  --primary-hover: #02891a;
+  --primary-active: #026a14;
+
+  --disabled: #d7d7d7;
+
+  --gray: #323232;
+  --gray-hover: #565656;
+  --gray-active: #121212;
+
+  --line: #f7f7f8;
+  --line-hover: #e5e5e5;
+  --abc: #e6f9e9;
+
+  --error: #e82929;
+  --border: #e5e5e5;
+  --border-hover: #bababa;
+  --border-active: #03c124;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-sans:
+    'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
+    'Segoe UI', Roboto, 'Noto Sans KR', 'Helvetica Neue', Arial, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol';
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+  --color-error: var(--error);
+  --color-border: var(--border);
+  --color-border-hover: var(--border-hover);
+  --color-line-primary: var(--line-primary);
+  --color-line-primary-hover: var(--line-primary-hover);
+  --color-disabled: var(--disabled);
+  --color-gray: var(--gray);
+  --color-gray-hover: var(--gray-hover);
+  --color-gray-active: var(--gray-active);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* font size */
+  --text-10: 0.625rem;
+  --text-11: 0.6875rem;
+  --text-12: 0.75rem;
+  --text-13: 0.8125rem;
+  --text-14: 0.875rem;
+  --text-15: 0.9375rem;
+  --text-16: 1rem;
+  --text-17: 1.0625rem;
+  --text-18: 1.125rem;
+  --text-19: 1.1875rem;
+  --text-20: 1.25rem;
+  --text-21: 1.3125rem;
+  --text-22: 1.375rem;
+  --text-23: 1.4375rem;
+  --text-24: 1.5rem;
+  --text-25: 1.5625rem;
+  --text-26: 1.625rem;
+  --text-27: 1.6875rem;
+  --text-28: 1.75rem;
+  --text-29: 1.8125rem;
+  --text-30: 1.875rem;
+  --text-31: 1.9375rem;
+  --text-32: 2rem;
+  --text-33: 2.0625rem;
+  --text-34: 2.125rem;
+  --text-35: 2.1875rem;
+  --text-36: 2.25rem;
+  --text-37: 2.3125rem;
+  --text-38: 2.375rem;
+  --text-39: 2.4375rem;
+  --text-40: 2.5rem;
+  --text-41: 2.5625rem;
+  --text-42: 2.625rem;
+  --text-43: 2.6875rem;
+  --text-44: 2.75rem;
+  --text-45: 2.8125rem;
+  --text-46: 2.875rem;
+  --text-47: 2.9375rem;
+  --text-48: 3rem;
+  --text-49: 3.0625rem;
+  --text-50: 3.125rem;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }
