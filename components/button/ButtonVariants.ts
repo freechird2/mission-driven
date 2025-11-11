@@ -1,7 +1,7 @@
 import { cva, VariantProps } from 'class-variance-authority';
 
 export const buttonVariants = cva(
-  'flex items-center justify-center w-full font-semibold cursor-pointer disabled:cursor-not-allowed',
+  'flex items-center justify-center font-semibold cursor-pointer disabled:cursor-not-allowed',
   {
     variants: {
       variant: {
@@ -17,6 +17,10 @@ export const buttonVariants = cva(
       },
       isActive: {
         true: '',
+        false: '',
+      },
+      fullWidth: {
+        true: 'w-full',
         false: '',
       },
     },

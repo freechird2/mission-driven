@@ -3,6 +3,22 @@
 import { useRef, useState } from 'react';
 import { TextareaVariants, textareaVariants } from './TextareaVariants';
 
+/**
+ * Textarea 컴포넌트
+ *
+ * 텍스트 입력 영역 컴포넌트로, 글자 수 카운터와 에러 상태를 지원합니다.
+ *
+ * @param value - 입력값 (필수)
+ * @param maxLength - 최대 글자 수 (기본값: 80)
+ * @param minLength - 최소 글자 수 (기본값: 8)
+ * @param errorMessage - 에러 메시지 (기본값: '설명 문구 입력')
+ * @param placeholder - placeholder 텍스트 (기본값: '텍스트를 입력해주세요')
+ *
+ * @example
+ * <Textarea value={text} onChange={(e) => setText(e.target.value)} />
+ * <Textarea value={text} maxLength={100} minLength={10} errorMessage="최소 10자 이상 입력해주세요" />
+ */
+
 interface TextareaProps
   extends TextareaVariants,
     React.TextareaHTMLAttributes<HTMLTextAreaElement> {
