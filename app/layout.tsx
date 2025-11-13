@@ -1,4 +1,6 @@
+import DialogContainer from '@/components/dialog/DialogContainer';
 import type { Metadata } from 'next';
+import { Toaster } from 'sonner';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -13,7 +15,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`antialiased`}>{children}</body>
+      <body className={`antialiased`}>
+        {children}
+        <DialogContainer />
+        <Toaster
+          className="test"
+          position="bottom-center"
+          // offset={{
+          //   top: '40px',
+          // }}
+          toastOptions={{
+            duration: 1300,
+          }}
+        />
+      </body>
     </html>
   );
 }

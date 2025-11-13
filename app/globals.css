@@ -48,6 +48,8 @@
   --color-ghost-hover: var(--ghost-hover);
   --color-ghost-active: var(--ghost-active);
 
+  --color-base-dimmed: rgba(0, 0, 0, 0.4);
+
   /* font size */
   --text-10: 0.625rem;
   --text-11: 0.6875rem;
@@ -110,4 +112,13 @@ body {
 
 .box-style {
   @apply rounded-lg border border-solid border-border bg-white;
+}
+
+/* Sonner toast 컨테이너 너비 제거 */
+[data-sonner-toaster] {
+  --width: 100dvw !important;
+  /* width: 100dvw !important; */
+  /* left: 50% !important; */
+  /* transform: translateX(-50%) !important; */
+  /* right: auto !important; */
 }
