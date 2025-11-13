@@ -1,14 +1,19 @@
 'use client';
 
 import Button from '@/components/button/Button';
+import Modal from '@/components/dialog/Modal/Modal';
 import Heading from '@/components/heading/Heading';
 import ChevronRight from '@/components/icons/ChevronRight';
 import XIcon from '@/components/icons/XIcon';
 import ImageButton from '@/components/imageButton/ImageButton';
 import Loading from '@/components/loading/Loading';
 import Textarea from '@/components/textarea/Textarea';
+import { categories } from '@/data/categories';
+import useDialog from '@/hooks/useDialog';
 import { useWindowWidth } from '@/hooks/useWindowWidth';
+import CategoryModal from '@/modals/CategoryModal';
 import { Contents } from '@/models/contents';
+import clsx from 'clsx';
 import Image from 'next/image';
 import { useCallback, useRef, useState } from 'react';
 import SessionComponent from './SessionComponent';
@@ -21,6 +26,7 @@ const RegistContent = () => {
 
   const [contents, setContents] = useState<Contents>({
     title: '',
+    categoryIds: [],
     sessions: [
       {
         activityContent: '',
@@ -37,6 +43,8 @@ const RegistContent = () => {
     mainImage: null,
     additionalImages: [],
   });
+
+  const { open } = useDialog();
 
   const handleMainImageChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,6 +130,21 @@ const RegistContent = () => {
       ],
     }));
   }, [setContents]);
+
+  const handleSelectCategories = (categoryIds: number[]) => {
+    setContents((prev) => ({ ...prev, categoryIds }));
+  };
+
+  const handleOpenCategoryDialog = useCallback(() => {
+    open(
+      <Modal>
+        <CategoryModal
+          initialSelectedCategoriesIds={contents.categoryIds}
+          onSelectCategories={handleSelectCategories}
+        />
+      </Modal>,
+    );
+  }, [contents.categoryIds, open]);
 
   if (!isMounted) return <Loading />;
 
@@ -274,11 +297,26 @@ const RegistContent = () => {
         <div className="flex flex-col gap-10">
           <div className="flex flex-col gap-3 md:gap-4">
             <Heading variant="h1">카테고리</Heading>
-            <div className="box-style flex items-center justify-between cursor-pointer h-15 p-4">
-              <span className="text-18 font-medium leading-[1.3] text-[#8f8f8f]">
-                주제를 선택해주세요
+            <div
+              className="box-style flex items-center justify-between cursor-pointer h-12 md:h-15 p-4"
+              onClick={handleOpenCategoryDialog}
+            >
+              <span
+                className={clsx(
+                  'text-16 md:text-18 font-medium leading-[1.3]',
+                  contents.categoryIds.length > 0 ? 'text-[#121212]' : 'text-[#8f8f8f]',
+                )}
+              >
+                {contents.categoryIds.length > 0
+                  ? contents.categoryIds
+                      .map(
+                        (categoryId) =>
+                          categories.find((category) => category.id === categoryId)?.name,
+                      )
+                      .join(', ')
+                  : '주제를 선택해주세요'}
               </span>
-              <ChevronRight className="w-7 h-7" />
+              <ChevronRight className="w-6 h-6 md:w-7 md:h-7" />
             </div>
           </div>
           <div className="flex flex-col gap-3 md:gap-4">

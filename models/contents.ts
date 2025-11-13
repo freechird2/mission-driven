@@ -11,8 +11,9 @@ export interface SessionContent {
 
 export interface Contents {
   title: string;
-  sessions: SessionContent[];
-  activityType: 'online' | 'offline' | null;
   mainImage: File | null;
   additionalImages: File[];
+  categoryIds: number[];
+  activityType: 'online' | 'offline' | null;
+  sessions: SessionContent[];
 }
