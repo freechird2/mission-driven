@@ -1,7 +1,7 @@
 import { cva, VariantProps } from 'class-variance-authority';
 
 export const textareaVariants = cva(
-  'flex flex-col gap-1 w-full h-[118px] md:h-[138px] border rounded-lg py-4 px-4',
+  'flex flex-col justify-between gap-1 w-full h-full min-h-[118px] md:min-h-[138px] border rounded-lg pb-4 px-4',
   {
     variants: {
       isFocused: {

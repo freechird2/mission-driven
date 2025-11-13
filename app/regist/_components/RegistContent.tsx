@@ -33,7 +33,7 @@ const RegistContent = () => {
     sessions: [
       {
         activityContent: '',
-        date: '',
+        date: null,
         startMeridiem: 'am',
         startTimeHour: '10',
         startTimeMinute: '00',
@@ -170,7 +170,7 @@ const RegistContent = () => {
         ...prev.sessions,
         {
           activityContent: '',
-          date: '',
+          date: null,
           startMeridiem: 'am',
           startTimeHour: '10',
           startTimeMinute: '00',
@@ -405,7 +405,8 @@ const RegistContent = () => {
               value={contents.title}
               errorMessage="8자 이상 입력해주세요"
               onChange={(e) => {
-                const value = e.target.value.replace(/\s{2,}/g, ' ');
+                // 연속된 공백과 탭만 하나로 치환 (줄바꿈은 유지)
+                const value = e.target.value.replace(/[ \t]{2,}/g, ' ');
                 setContents((prev) => ({ ...prev, title: value }));
               }}
             />
@@ -442,7 +443,7 @@ const RegistContent = () => {
             {contents.sessions.map((session, index) => (
               <SessionComponent
                 key={index}
-                session={session}
+                contents={contents}
                 setContents={setContents}
                 index={index}
                 isMultiple={contents.sessions.length > 1}
