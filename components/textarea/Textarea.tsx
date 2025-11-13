@@ -46,7 +46,7 @@ const Textarea = ({
   };
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1 bg-white">
       <div
         className={textareaVariants({ isError, isFocused })}
         onClick={() => {
@@ -56,7 +56,7 @@ const Textarea = ({
       >
         <textarea
           ref={textareaRef}
-          className="w-full h-full resize-none border-none outline-none text-[#121212] text-medium text-16 md:text-18 leading-[1.3] placeholder:text-[#8F8F8F] placeholder:text-medium placeholder:text-16 md:placeholder:text-18 placeholder:leading-[1.3]"
+          className="w-full h-full resize-none border-none outline-none text-[#121212] text-medium text-16 md:text-18 leading-[1.3] placeholder:text-[#8F8F8F] placeholder:text-medium placeholder:text-16 md:placeholder:text-18 placeholder:leading-[1.3] hide-scrollbar"
           {...props}
           maxLength={maxLength}
           minLength={minLength}

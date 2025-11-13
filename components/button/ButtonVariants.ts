@@ -1,14 +1,14 @@
 import { cva, VariantProps } from 'class-variance-authority';
 
 export const buttonVariants = cva(
-  'flex items-center justify-center font-semibold cursor-pointer disabled:cursor-not-allowed',
+  'flex items-center justify-center font-semibold cursor-pointer disabled:cursor-not-allowed outline-none',
   {
     variants: {
       variant: {
         gray: 'bg-gray text-white hover:bg-gray-hover active:bg-gray-active disabled:bg-disabled',
         primary:
           'bg-primary text-white hover:bg-primary-hover active:bg-primary-active disabled:bg-disabled',
-        line: 'bg-line text-gray border border-border hover:bg-line-hover hover:border-border-hover active:bg-[#E6F9E9] active:text-primary active:border-primary disabled:bg-[#E5E5E5] disabled:border-[#D7D7D7] disabled:text-[#8F8F8F]',
+        line: 'border disabled:bg-[#E5E5E5] disabled:border-[#D7D7D7] disabled:text-[#8F8F8F]',
       },
       size: {
         small: 'rounded-sm h-[38px] text-16 leading-[1.4]',
@@ -38,7 +38,14 @@ export const buttonVariants = cva(
       {
         variant: 'line',
         isActive: true,
-        className: 'bg-[#E6F9E9] text-primary border-primary',
+        className:
+          'bg-ghost-active text-primary border-primary hover:bg-ghost-active hover:border-primary',
+      },
+      {
+        variant: 'line',
+        isActive: false,
+        className:
+          'bg-ghost text-gray border-border hover:bg-ghost-hover hover:border-border-hover',
       },
     ],
   },
