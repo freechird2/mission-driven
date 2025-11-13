@@ -10,12 +10,14 @@ import Loading from '@/components/loading/Loading';
 import Textarea from '@/components/textarea/Textarea';
 import { categories } from '@/data/categories';
 import useDialog from '@/hooks/useDialog';
+import useToast from '@/hooks/useToast';
 import { useWindowWidth } from '@/hooks/useWindowWidth';
 import CategoryModal from '@/modals/CategoryModal';
 import { Contents } from '@/models/contents';
+import { resizeImage } from '@/utils/imageResize';
 import clsx from 'clsx';
 import Image from 'next/image';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import SessionComponent from './SessionComponent';
 
 const RegistContent = () => {
@@ -23,6 +25,7 @@ const RegistContent = () => {
   const additionalReplaceImagesInputRef = useRef<HTMLInputElement>(null);
   const { width, isMounted } = useWindowWidth();
   const [replaceImageIndex, setReplaceImageIndex] = useState<number>(0);
+  const { toast } = useToast();
 
   const [contents, setContents] = useState<Contents>({
     title: '',
@@ -41,75 +44,123 @@ const RegistContent = () => {
     ],
     activityType: null,
     mainImage: null,
+    mainImagePreview: null,
     additionalImages: [],
+    additionalImagesPreviews: [],
   });
 
   const { open } = useDialog();
 
   const handleMainImageChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file && file.type.startsWith('image/')) {
         if (file.size > 15 * 1024 * 1024) {
-          alert('이미지 파일 용량이 너무 큽니다. (최대 15MB)');
+          toast('이미지 파일 용량이 너무 큽니다. (최대 15MB)');
           return;
         }
-        setContents((prev) => ({ ...prev, mainImage: file }));
+
+        if (contents.mainImagePreview) {
+          URL.revokeObjectURL(contents.mainImagePreview);
+        }
+
+        try {
+          const resizedBlob = await resizeImage(file, 800, 800); // 크기 더 줄이기
+          const previewUrl = URL.createObjectURL(resizedBlob);
+          setContents((prev) => ({ ...prev, mainImage: file, mainImagePreview: previewUrl }));
+        } catch (error) {
+          console.error('Image resize error:', error);
+          const previewUrl = URL.createObjectURL(file);
+          setContents((prev) => ({ ...prev, mainImage: file, mainImagePreview: previewUrl }));
+        }
       }
     },
     [setContents],
   );
 
   const handleAdditionalImagesChange = useCallback(
-    (files: File[]) => {
-      // 최대 4장 제한을 고려하여 추가 가능한 개수만큼만 처리
+    async (files: File[]) => {
       const remainingSlots = 4 - contents.additionalImages.length;
+      if (remainingSlots - files.length < 0) {
+        toast('최대 4장까지 등록할 수 있어요');
+        return;
+      }
+
       const filesToProcess = files.slice(0, remainingSlots);
 
-      filesToProcess.forEach((file: File) => {
+      const processedFiles: { file: File; previewUrl: string }[] = [];
+
+      // 순차적으로 처리하여 메모리 부담 감소
+      for (const file of filesToProcess) {
         if (file.size > 15 * 1024 * 1024) {
-          alert('이미지 파일 용량이 너무 큽니다. (최대 15MB)');
-          return;
+          toast('이미지 파일 용량이 너무 큽니다. (최대 15MB)');
+          continue;
         }
 
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setContents((prev) => ({ ...prev, additionalImages: [file, ...prev.additionalImages] }));
-          // 최대 4장 제한 체크
-          if (contents.additionalImages.length < 4) {
-            return { ...contents, additionalImages: [file, ...contents.additionalImages] };
-          }
-          return contents;
-        };
-        reader.readAsDataURL(file);
-      });
+        try {
+          const resizedBlob = await resizeImage(file, 600, 600); // 크기 더 줄이기
+          const previewUrl = URL.createObjectURL(resizedBlob);
+          processedFiles.push({ file, previewUrl });
+        } catch (error) {
+          console.error('Image resize error:', error);
+          const previewUrl = URL.createObjectURL(file);
+          processedFiles.push({ file, previewUrl });
+        }
+      }
+
+      if (processedFiles.length === 0) return;
+
+      // 한 번에 상태 업데이트
+      setContents((prev) => ({
+        ...prev,
+        additionalImages: [...processedFiles.map((item) => item.file), ...prev.additionalImages],
+        additionalImagesPreviews: [
+          ...processedFiles.map((item) => item.previewUrl),
+          ...prev.additionalImagesPreviews,
+        ],
+      }));
     },
-    [setContents],
+    [contents.additionalImages.length],
   );
 
   const handleAdditionalReplaceImagesChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file && file.type.startsWith('image/')) {
         if (file.size > 15 * 1024 * 1024) {
-          alert('이미지 파일 용량이 너무 큽니다. (최대 15MB)');
+          toast('이미지 파일 용량이 너무 큽니다. (최대 15MB)');
           return;
         }
 
+        let previewUrl = '';
+
+        try {
+          const resizedBlob = await resizeImage(file, 800, 800);
+          previewUrl = URL.createObjectURL(resizedBlob);
+        } catch (error) {
+          console.error('Image resize error:', error);
+          previewUrl = URL.createObjectURL(file);
+        }
+
         setContents((prev) => {
+          // 기존 preview URL 해제
+          if (prev.additionalImagesPreviews[replaceImageIndex]) {
+            URL.revokeObjectURL(prev.additionalImagesPreviews[replaceImageIndex]);
+          }
+
           return {
             ...prev,
-            additionalImages: prev.additionalImages.map((image, index) => {
-              if (index === replaceImageIndex) {
-                return file;
-              }
-              return image;
-            }),
+            additionalImages: prev.additionalImages.map((image, index) =>
+              index === replaceImageIndex ? file : image,
+            ),
+            additionalImagesPreviews: prev.additionalImagesPreviews.map((preview, index) =>
+              index === replaceImageIndex ? previewUrl : preview,
+            ),
           };
         });
       }
     },
-    [handleAdditionalImagesChange, replaceImageIndex],
+    [replaceImageIndex],
   );
 
   const handleAddSession = useCallback(() => {
@@ -146,6 +197,33 @@ const RegistContent = () => {
     );
   }, [contents.categoryIds, open]);
 
+  // 삭제 함수를 별도로 분리
+  const handleDeleteImage = useCallback((index: number) => {
+    setContents((prev) => {
+      // 기존 preview URL 해제
+      if (prev.additionalImagesPreviews[index]) {
+        URL.revokeObjectURL(prev.additionalImagesPreviews[index]);
+      }
+
+      return {
+        ...prev,
+        additionalImagesPreviews: prev.additionalImagesPreviews.filter((_, i) => i !== index),
+        additionalImages: prev.additionalImages.filter((_, i) => i !== index),
+      };
+    });
+  }, []);
+
+  // 컴포넌트 언마운트 시 모든 blob URL 해제
+  useEffect(() => {
+    return () => {
+      contents.additionalImagesPreviews.forEach((url) => {
+        if (url) {
+          URL.revokeObjectURL(url);
+        }
+      });
+    };
+  }, []); // 빈 배열 - 컴포넌트 언마운트 시에만 실행
+
   if (!isMounted) return <Loading />;
 
   return (
@@ -157,9 +235,10 @@ const RegistContent = () => {
           <div className="relative w-full flex flex-col items-center justify-center gap-3 lg:gap-4 aspect-square bg-[#F7F7F8] rounded-lg border border-solid border-border overflow-hidden">
             {contents.mainImage ? (
               <Image
-                src={URL.createObjectURL(contents.mainImage)}
+                src={contents.mainImagePreview || URL.createObjectURL(contents.mainImage)}
                 alt="대표이미지"
                 fill
+                unoptimized
                 className="object-cover cursor-pointer"
                 onClick={() => {
                   mainImageInputRef.current?.click();
@@ -209,32 +288,33 @@ const RegistContent = () => {
           {/* 데스크탑 뷰 */}
           <div className="grid-cols-2 gap-2 hidden md:grid">
             {/* 등록된 이미지들 */}
-            {contents.additionalImages.map((imageUrl, index) => (
-              <div key={index} className="relative w-full aspect-square group">
-                <Image
-                  src={URL.createObjectURL(imageUrl)}
-                  alt={`추가 이미지 ${index + 1}`}
-                  fill
-                  className="object-cover rounded-lg border border-solid border-border cursor-pointer"
-                  onClick={() => {
-                    setReplaceImageIndex(index);
-                    additionalReplaceImagesInputRef.current?.click();
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setContents((prev) => ({
-                      ...prev,
-                      additionalImages: prev.additionalImages.filter((_, i) => i !== index),
-                    }));
-                  }}
-                  className="absolute top-2 right-2 w-6 h-6 bg-white/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[#F7F7F8] cursor-pointer"
-                >
-                  <XIcon className="w-6 h-6" />
-                </button>
-              </div>
-            ))}
+            {contents.additionalImages.map((imageFile, index) => {
+              const previewUrl = contents.additionalImagesPreviews[index];
+              if (!previewUrl) return null; // preview가 없으면 렌더링하지 않음
+
+              return (
+                <div key={`image-${index}`} className="relative w-full aspect-square group">
+                  <Image
+                    src={previewUrl}
+                    alt={`추가 이미지 ${index + 1}`}
+                    fill
+                    unoptimized
+                    className="object-cover rounded-lg border border-solid border-border cursor-pointer"
+                    onClick={() => {
+                      setReplaceImageIndex(index);
+                      additionalReplaceImagesInputRef.current?.click();
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteImage(index)}
+                    className="absolute top-2 right-2 w-6 h-6 bg-white/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                  >
+                    <XIcon className="w-5 h-5 text-black" />
+                  </button>
+                </div>
+              );
+            })}
             {/* 이미지 추가 버튼 (최대 4장까지) */}
             {contents.additionalImages.length < 4 && (
               <ImageButton onImageSelect={handleAdditionalImagesChange} />
@@ -250,12 +330,16 @@ const RegistContent = () => {
           {/* 모바일 뷰 */}
           <div className="overflow-x-auto -ml-4 -mr-4 hide-scrollbar">
             <div className="flex gap-2 md:hidden px-4">
-              {contents.additionalImages.map((imageUrl, index) => (
-                <div key={index} className="relative aspect-square group h-[120px] w-[120px]">
+              {contents.additionalImages.map((imageFile, index) => (
+                <div
+                  key={`mobile-image-${index}`}
+                  className="relative aspect-square group h-[120px] w-[120px]"
+                >
                   <Image
-                    src={URL.createObjectURL(imageUrl)}
+                    src={contents.additionalImagesPreviews[index] || URL.createObjectURL(imageFile)}
                     alt={`추가 이미지 ${index + 1}`}
                     fill
+                    unoptimized
                     className="object-cover rounded-lg border border-solid border-border cursor-pointer"
                     onClick={() => {
                       setReplaceImageIndex(index);
@@ -264,15 +348,10 @@ const RegistContent = () => {
                   />
                   <button
                     type="button"
-                    onClick={() => {
-                      setContents((prev) => ({
-                        ...prev,
-                        additionalImages: prev.additionalImages.filter((_, i) => i !== index),
-                      }));
-                    }}
-                    className="absolute top-2 right-2 w-5 h-5 bg-white/80 rounded-full flex items-center justify-center hover:bg-[#F7F7F8] cursor-pointer"
+                    onClick={() => handleDeleteImage(index)}
+                    className="absolute top-2 right-2 w-5 h-5 bg-white/50 rounded-full flex items-center justify-center hover:bg-[#F7F7F8] cursor-pointer"
                   >
-                    <XIcon className="w-6 h-6" />
+                    <XIcon className="w-6 h-6 text-black" />
                   </button>
                 </div>
               ))}
@@ -324,7 +403,11 @@ const RegistContent = () => {
             <Textarea
               placeholder="제목을 입력해주세요"
               value={contents.title}
-              onChange={(e) => setContents((prev) => ({ ...prev, title: e.target.value }))}
+              errorMessage="8자 이상 입력해주세요"
+              onChange={(e) => {
+                const value = e.target.value.replace(/\s{2,}/g, ' ');
+                setContents((prev) => ({ ...prev, title: value }));
+              }}
             />
           </div>
 
