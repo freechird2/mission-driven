@@ -15,9 +15,9 @@
   --gray-hover: #565656;
   --gray-active: #121212;
 
-  --line: #f7f7f8;
-  --line-hover: #e5e5e5;
-  --abc: #e6f9e9;
+  --ghost: #f7f7f8;
+  --ghost-hover: #e5e5e5;
+  --ghost-active: #e6f9e9;
 
   --error: #e82929;
   --border: #e5e5e5;
@@ -44,6 +44,9 @@
   --color-gray: var(--gray);
   --color-gray-hover: var(--gray-hover);
   --color-gray-active: var(--gray-active);
+  --color-ghost: var(--ghost);
+  --color-ghost-hover: var(--ghost-hover);
+  --color-ghost-active: var(--ghost-active);
 
   /* font size */
   --text-10: 0.625rem;
@@ -103,4 +106,8 @@ body {
 
 .hide-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
+}
+
+.box-style {
+  @apply rounded-lg border border-solid border-border bg-white;
 }
