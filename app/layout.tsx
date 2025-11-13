@@ -20,7 +20,7 @@ export default function RootLayout({
         <DialogContainer />
         <Toaster
           className="test"
-          position="bottom-center"
+          position="top-center"
           // offset={{
           //   top: '40px',
           // }}

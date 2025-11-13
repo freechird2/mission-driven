@@ -12,7 +12,9 @@ export interface SessionContent {
 export interface Contents {
   title: string;
   mainImage: File | null;
+  mainImagePreview: string | null;
   additionalImages: File[];
+  additionalImagesPreviews: string[];
   categoryIds: number[];
   activityType: 'online' | 'offline' | null;
   sessions: SessionContent[];

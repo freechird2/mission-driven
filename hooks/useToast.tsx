@@ -16,7 +16,7 @@ interface ToastProps {
 
 const Toast = ({ type = 'success', message }: ToastProps) => {
   return (
-    <div className="w-[calc(100dvw-32px)] grid place-items-center pb-15 md:pb-30">
+    <div className="w-[calc(100dvw-32px)] grid place-items-center pt-8 md:pt-5 pointer-events-none">
       <div className="text-white bg-[#323232] flex w-full max-w-[calc(100dvw-32px)] md:max-w-[520px] items-center gap-2 rounded-lg p-3 shadow-lg">
         {/* {type === "success" && (
         <Icon
