@@ -1,5 +1,5 @@
 export interface SessionContent {
-  date?: string;
+  date?: Date | null;
   startMeridiem: 'am' | 'pm';
   startTimeHour: string;
   startTimeMinute: string;

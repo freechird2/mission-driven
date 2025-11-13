@@ -23,6 +23,8 @@
   --border: #e5e5e5;
   --border-hover: #bababa;
   --border-active: #03c124;
+
+  --default-text: #121212;
 }
 
 @theme inline {
@@ -47,6 +49,8 @@
   --color-ghost: var(--ghost);
   --color-ghost-hover: var(--ghost-hover);
   --color-ghost-active: var(--ghost-active);
+
+  --color-default-text: var(--default-text);
 
   --color-base-dimmed: rgba(0, 0, 0, 0.4);
 
@@ -113,6 +117,61 @@ body {
 .box-style {
   @apply rounded-lg border border-solid border-border bg-white;
 }
+
+/* react-day-picker 커스텀 스타일 */
+/* .rdp {
+  --rdp-cell-size: 40px;
+  --rdp-accent-color: var(--primary);
+  --rdp-background-color: var(--ghost-active);
+  --rdp-accent-color-dark: var(--primary);
+  --rdp-background-color-dark: var(--ghost-active);
+  --rdp-outline: 2px solid var(--primary);
+  --rdp-outline-selected: 2px solid var(--primary);
+  margin: 0;
+}
+
+.rdp-table {
+  display: table;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rdp-tbody {
+  display: table-row-group;
+}
+
+.rdp-row {
+  display: table-row;
+}
+
+.rdp-cell {
+  display: table-cell;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.rdp-day_selected,
+.rdp-day_selected:focus-visible,
+.rdp-day_selected:hover {
+  background-color: var(--primary) !important;
+  color: white !important;
+}
+
+.rdp-day_outside {
+  color: #8f8f8f !important;
+  opacity: 0.5;
+}
+
+.rdp-nav_button {
+  border: 1px solid var(--border) !important;
+  background-color: white !important;
+}
+
+.rdp-nav_button:hover {
+  background-color: var(--ghost) !important;
+} */
 
 /* Sonner toast 컨테이너 너비 제거 */
 [data-sonner-toaster] {

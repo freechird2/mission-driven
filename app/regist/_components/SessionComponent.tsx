@@ -1,24 +1,65 @@
 import Button from '@/components/button/Button';
+import CustomDayPicker from '@/components/customDayPicker/CustomDayPicker';
 import Heading from '@/components/heading/Heading';
 import XIcon from '@/components/icons/XIcon';
 import Textarea from '@/components/textarea/Textarea';
-import { Contents, SessionContent } from '@/models/contents';
-import { useCallback } from 'react';
+import { Contents } from '@/models/contents';
+import clsx from 'clsx';
+import { addDays, format, subDays } from 'date-fns';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface SessionProps {
-  session: SessionContent;
+  contents: Contents;
   setContents: React.Dispatch<React.SetStateAction<Contents>>;
   index: number;
   isMultiple?: boolean;
 }
 
-const SessionComponent = ({ session, setContents, index, isMultiple = false }: SessionProps) => {
+const SessionComponent = ({ contents, setContents, index, isMultiple = false }: SessionProps) => {
+  const [openDayPicker, setOpenDayPicker] = useState(false);
+  const dayPickerRef = useRef<HTMLDivElement>(null);
+  const dayPickerBoxRef = useRef<HTMLDivElement>(null);
+
+  const session = useMemo(() => contents.sessions[index], [contents, index]);
+
+  // 외부 클릭 감지
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        openDayPicker &&
+        dayPickerRef.current &&
+        !dayPickerRef.current.contains(event.target as Node) &&
+        !dayPickerBoxRef.current?.contains(event.target as Node)
+      ) {
+        setOpenDayPicker(false);
+      }
+    };
+
+    if (openDayPicker) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [openDayPicker]);
+
   const handleRemoveSession = useCallback(() => {
     setContents((prev) => ({
       ...prev,
       sessions: prev.sessions.filter((_, i) => i !== index),
     }));
   }, [setContents, index]);
+
+  const handleSelectDate = useCallback(
+    (date: Date | null) => {
+      setContents((prev) => ({
+        ...prev,
+        sessions: prev.sessions.map((session, i) => (i === index ? { ...session, date } : session)),
+      }));
+    },
+    [contents, index, setContents],
+  );
 
   return (
     <div className="relative py-6 md:py-7 px-4 md:px-5 flex flex-col gap-8 bg-[#F7F7F8] rounded-lg">
@@ -33,11 +74,47 @@ const SessionComponent = ({ session, setContents, index, isMultiple = false }: S
       <div className="flex flex-col gap-4">
         <Heading variant="h2">{isMultiple ? `${index + 1}회차 정보` : '회차 정보'}</Heading>
         <div className="flex flex-col gap-3">
-          <div className="h-13 md:h-15 grid grid-cols-[auto_1fr] items-center gap-6">
+          <div className="relative h-13 md:h-15 grid grid-cols-[auto_1fr] items-center gap-6">
             <span className="text-16 md:text-18 font-semibold leading-[1.3]">날짜 선택</span>
-            <div className="box-style px-4 h-full text-[#8F8F8F] text-16 md:text-20 font-medium leading-[1.3] flex items-center justify-center cursor-pointer">
-              날짜를 선택해주세요
+            <div
+              ref={dayPickerBoxRef}
+              className={clsx(
+                'box-style px-4 h-full text-16 md:text-20 font-medium leading-[1.3] flex items-center justify-center cursor-pointer',
+                session.date ? 'text-default-text' : 'text-[#8F8F8F]',
+              )}
+              onClick={(event) => {
+                setOpenDayPicker(!openDayPicker);
+              }}
+            >
+              {session.date ? format(session.date, 'yyyy년 MM월 dd일') : '날짜를 선택해주세요'}
             </div>
+            {openDayPicker && (
+              <CustomDayPicker
+                onClose={() => setOpenDayPicker(false)}
+                dayPickerRef={dayPickerRef}
+                onSelectDate={handleSelectDate}
+                minDate={(() => {
+                  // index - 1부터 0번째까지 역순으로 검색
+                  for (let i = index - 1; i >= 0; i--) {
+                    const sessionDate = contents.sessions[i]?.date;
+                    if (sessionDate) {
+                      return addDays(sessionDate, 1);
+                    }
+                  }
+                  return undefined;
+                })()}
+                maxDate={(() => {
+                  // index + 1부터 마지막까지 순차적으로 검색
+                  for (let i = index + 1; i < contents.sessions.length; i++) {
+                    const sessionDate = contents.sessions[i]?.date;
+                    if (sessionDate) {
+                      return subDays(sessionDate, 1);
+                    }
+                  }
+                  return undefined;
+                })()}
+              />
+            )}
           </div>
           <div className="h-13 md:h-15 grid grid-cols-[auto_1fr] items-center gap-6">
             <span className="text-16 md:text-18 font-semibold leading-[1.3]">시작 시간</span>
@@ -280,14 +357,19 @@ const SessionComponent = ({ session, setContents, index, isMultiple = false }: S
             value={session.activityContent}
             maxLength={800}
             minLength={8}
-            onChange={(e) =>
+            autoResize
+            onChange={(e) => {
+              // 연속된 줄바꿈을 최대 2개로 제한
+              let value = e.target.value.replace(/\n{3,}/g, '\n\n');
+              // 연속된 공백과 탭만 하나로 치환 (줄바꿈은 유지)
+              value = value.replace(/[ \t]{2,}/g, ' ');
               setContents((prev) => ({
                 ...prev,
                 sessions: prev.sessions.map((session, i) =>
-                  i === index ? { ...session, activityContent: e.target.value } : session,
+                  i === index ? { ...session, activityContent: value } : session,
                 ),
-              }))
-            }
+              }));
+            }}
           />
         </div>
       </div>
