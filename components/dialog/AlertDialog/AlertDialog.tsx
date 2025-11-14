@@ -57,12 +57,16 @@ const AlertDialog = ({
               }
             }}
           />
-          <motion.div className="relative w-[min(calc(100%-var(--spacing-mobile-safe-inline-area)),17.5rem)] rounded-[0.5rem] border-[1px_solid_var(--color-gray-100)] bg-white p-[1.5rem_1rem_1rem] shadow-lg">
-            <div className="pb-[1.5rem] text-center">
+          <motion.div className="relative w-[min(calc(100%-var(--spacing-mobile-safe-inline-area)),17.5rem)] rounded-lg border-[1px_solid_var(--color-gray-100)] bg-white p-[1.5rem_1rem_1rem] shadow-lg">
+            <div className="pb-6 text-center">
               {title && (
-                <p className="font-600 text-20 pb-[0.5rem] leading-[1.3] text-gray-900">{title}</p>
+                <p className="font-600 text-20 font-bold pb-2 leading-[1.3] text-gray-900">
+                  {title}
+                </p>
               )}
-              <p className="leading-[1.3] whitespace-pre-line text-gray-700">{content}</p>
+              <p className="leading-[1.3] text-16 font-semibold whitespace-pre-line text-gray-700">
+                {content}
+              </p>
             </div>
 
             <div className="flex gap-2">

@@ -1,7 +1,9 @@
 'use client';
 
+import useDialog from '@/hooks/useDialog';
 import { useCallback } from 'react';
 import Button from '../button/Button';
+import AlertDialog from '../dialog/AlertDialog/AlertDialog';
 
 /**
  * Header 컴포넌트
@@ -26,9 +28,21 @@ interface HeaderProps {
 }
 
 const Header = ({ title = '과제', isMain = true, isValid = false, onNext }: HeaderProps) => {
+  const { open } = useDialog();
+
   const handleNext = useCallback(() => {
     if (isMain) {
-      alert('다음으로');
+      open(
+        <AlertDialog
+          type="Alert"
+          title="✅ 검증 완료!"
+          content={`시간 입력은 UX 개선을 위해
+            24시간 형식 셀렉트로 구현했습니다.
+            자세한 내용은 SessionComponent.tsx
+            주석을 참고해주세요.
+            감사합니다!`}
+        />,
+      );
     } else {
       onNext?.();
     }
