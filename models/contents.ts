@@ -1,9 +1,7 @@
 export interface SessionContent {
   date?: Date | null;
-  startMeridiem: 'am' | 'pm';
   startTimeHour: string;
   startTimeMinute: string;
-  endMeridiem: 'am' | 'pm';
   endTimeHour: string;
   endTimeMinute: string;
   activityContent: string;
