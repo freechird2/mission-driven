@@ -42,8 +42,18 @@ const RegistTemplate = () => {
       */}
       <Header isMain isValid={isValidate} />
 
-      {/* 메인 컨텐츠 영역 */}
-      <div className="h-full w-full mt-[48px] md:mt-[64px] bg-white">
+      {/* 
+        메인 컨텐츠 영역
+        - <main> 태그로 시맨틱 HTML 구조 명시
+        - id="main-content"로 스킵 링크 타겟 지정
+        - role="main"으로 랜드마크 역할 명시 (중복이지만 스크린 리더 호환성 향상)
+      */}
+      <main
+        id="main-content"
+        role="main"
+        className="h-full w-full mt-[48px] md:mt-[64px] bg-white"
+        aria-label="콘텐츠 등록 폼"
+      >
         {/* 
           RegistContent 컴포넌트
           - 폼의 모든 입력 필드를 관리
@@ -51,7 +61,7 @@ const RegistTemplate = () => {
           - useEffect로 실시간 검증 수행 (title, image, category, sessions 등)
         */}
         <RegistContent setIsValidate={setIsValidate} />
-      </div>
+      </main>
 
       {/* 
         모바일 전용 하단 고정 버튼
