@@ -49,7 +49,10 @@ const Header = ({ title = '과제', isMain = true, isValid = false, onNext }: He
   }, [isMain, onNext]);
 
   return (
-    <div className="w-full fixed top-0 left-0 h-[48px] md:h-[64px] border-b border-solid border-[#D7D7D7] bg-white px-5 z-10">
+    <header
+      className="w-full fixed top-0 left-0 h-[48px] md:h-[64px] border-b border-solid border-[#D7D7D7] bg-white px-5 z-10"
+      aria-label="페이지 헤더"
+    >
       <div className="relative flex items-center justify-center w-full h-full max-w-[1100px] mx-auto text-[#121212] text-18 md:text-24 font-bold leading-[1.3]">
         <span>{title}</span>
         <div className="absolute w-[120px] hidden md:block right-5 top-1/2 -translate-y-1/2">
@@ -58,7 +61,7 @@ const Header = ({ title = '과제', isMain = true, isValid = false, onNext }: He
           </Button>
         </div>
       </div>
-    </div>
+    </header>
   );
 };
 
